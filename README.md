@@ -14,7 +14,7 @@
 
 Raspberry pi 3, 3b, 3b+, 4, Zero 2W
 
-Raspberry pi Os 32bit LTS With Lagency Camera API
+Raspberry pi Os 32bit LTS With Legacy Camera API
 
 ### DLL Required
 
@@ -58,11 +58,11 @@ or manually set config path by `./localization ${path_to_yaml_file}`
 
 ### Check whether camera is working
 
-Camera Type We test v1 & v2 raspberry camera. But it should work with all camera which support Lagency Camera API on Raspberry Pi
+Camera Type We test v1 & v2 raspberry camera. But it should work with all camera which support Legacy Camera API on Raspberry Pi
 
 * Plugin camera
 
-* Open Lagency Camera interface with rasp `raspi-config`
+* Open Legacy Camera interface with rasp `raspi-config`
 
 * Reboot
 
