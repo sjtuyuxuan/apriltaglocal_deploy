@@ -109,3 +109,4 @@ T_b_c :
   - [0, 0, 1, 0]
   - [0, 0, 0, 1]
 PosePublishTopic : /Pose
+DebugPlot : true

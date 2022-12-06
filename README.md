@@ -30,7 +30,6 @@ mkdir 3rdparty && cd 3rdparty
 git clone https://github.com/AprilRobotics/apriltag && cd apriltag
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 sudo cmake --build build --target install
-
 ```
 
 ### Build Instruction (or direct run exe file with dll)
@@ -43,15 +42,13 @@ make
 
 ## How to run
 
-`./localization ${path_to_yaml_file}`
+`./localization`
 
-
+or manually set config path by `./localization ${path_to_yaml_file}`
 
 ## Sample
 
 ![sample.gif](/Users/yuxuan/git/apriltaglocal_deploy/sample.gif)
-
-
 
 ## Trouble shooting
 
@@ -74,8 +71,6 @@ Camera Type We test v1 & v2 raspberry camera. But it should work with all camera
 Run the release exe file after doing  **Install dll with `apt-get`**
 
 ### Simulate Test with video
-
-
 
 ### Camera calibration
 

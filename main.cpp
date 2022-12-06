@@ -143,12 +143,16 @@ void Backend (ceres::Problem& problem,
 
 int main(int argc, char** argv) {
   cv::VideoCapture capture;
-  if (argc != 2) {
+  std::string config_file_path_;
+  if (argc == 1) {
+    config_file_path_ = "../config.yaml";
+  } else if (argc == 2) {
+    config_file_path_ = argv[1];
+  } else {
     std::cout << "plz set yaml file path" << std::endl;
     return -1;
   }
-
-  std::string config_file_path_(argv[1]); 
+  
   std::cout << "yaml file path is:" << config_file_path_ << std::endl;
   YAML::Node config_ = YAML::LoadFile(config_file_path_);
 
@@ -156,6 +160,8 @@ int main(int argc, char** argv) {
   capture.set(cv::CAP_PROP_FRAME_WIDTH,640);
   capture.set(cv::CAP_PROP_FRAME_HEIGHT,480);
   std::cout << "Cam /dev/video0 is Opened and set resolution to 640 * 480" << std::endl;  
+
+  bool debug_plot = config_["DebugPlot"].as<bool>(false);
 
   cv::Mat distCoeffs(5,1,cv::DataType<double>::type);
   distCoeffs.at<double>(0) = config_["ImageDistrotion"][0].as<double>(0);
@@ -296,21 +302,26 @@ int main(int argc, char** argv) {
           center_y /= count;
           image_points.emplace_back(cv::Point2d(dot_center.x() - dot_size + center_x, dot_center.y() - dot_size + center_y));
           tag_points.emplace_back(cv::Point3d(dot[0], dot[1], 0));
-          cv::circle(gray_img, cv::Point(dot_center.x() - dot_size + center_x, dot_center.y() - dot_size + center_y), 4, cv::Scalar(0), -1);
-          cv::circle(gray_img, cv::Point(dot_center.x(), dot_center.y()), dot_size, cv::Scalar(0x4f), 2);
+          if (debug_plot) {
+            cv::circle(gray_img, cv::Point(dot_center.x() - dot_size + center_x, dot_center.y() - dot_size + center_y), 2, cv::Scalar(255), -1);
+            cv::circle(gray_img, cv::Point(dot_center.x(), dot_center.y()), dot_size, cv::Scalar(0x4f), 2);
+          }
         }
-        cv::line(gray_img, cv::Point(det->p[0][0], det->p[0][1]),
-                  cv::Point(det->p[1][0], det->p[1][1]),
-                  cv::Scalar(0), 2);
-        cv::line(gray_img, cv::Point(det->p[0][0], det->p[0][1]),
-                  cv::Point(det->p[3][0], det->p[3][1]),
-                  cv::Scalar(0x2f), 2);
-        cv::line(gray_img, cv::Point(det->p[1][0], det->p[1][1]),
-                  cv::Point(det->p[2][0], det->p[2][1]),
-                  cv::Scalar(0x5f), 2);
-        cv::line(gray_img, cv::Point(det->p[2][0], det->p[2][1]),
-                  cv::Point(det->p[3][0], det->p[3][1]),
-                  cv::Scalar(0x5f), 2);
+        if (debug_plot) {
+          cv::line(gray_img, cv::Point(det->p[0][0], det->p[0][1]),
+                    cv::Point(det->p[1][0], det->p[1][1]),
+                    cv::Scalar(0), 2);
+          cv::line(gray_img, cv::Point(det->p[0][0], det->p[0][1]),
+                    cv::Point(det->p[3][0], det->p[3][1]),
+                    cv::Scalar(0x2f), 2);
+          cv::line(gray_img, cv::Point(det->p[1][0], det->p[1][1]),
+                    cv::Point(det->p[2][0], det->p[2][1]),
+                    cv::Scalar(0x5f), 2);
+          cv::line(gray_img, cv::Point(det->p[2][0], det->p[2][1]),
+                    cv::Point(det->p[3][0], det->p[3][1]),
+                    cv::Scalar(0x5f), 2);
+        }
+
         cv::Mat rvec(3,1,cv::DataType<double>::type);
         cv::Mat tvec(3,1,cv::DataType<double>::type);
         cv::solvePnP(tag_points, image_points, cameraMatrix, distCoeffs, rvec, tvec);
@@ -326,8 +337,10 @@ int main(int argc, char** argv) {
       } 
     }
     if (T_tag_cam.empty()) {
-      cv::imshow("test", gray_img);
-      cv::waitKey(1);
+      if (debug_plot) {
+        cv::imshow("test", gray_img);
+        cv::waitKey(1);
+      }
       continue;
     }
     
@@ -356,21 +369,22 @@ int main(int argc, char** argv) {
       std::cout << T_tag0_cam[4] << "   " 
                 << T_tag0_cam[5] << "   " 
                 << T_tag0_cam[6] << std::endl;
-      cv::putText(gray_img, "Farme position (xyz):", cv::Point2i(20, 20),
-          cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0), 2);
-      cv::putText(gray_img, std::to_string(T_tag0_cam[4]), cv::Point2i(20, 50),
-          cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0), 2);
-      cv::putText(gray_img, std::to_string(T_tag0_cam[5]), cv::Point2i(20, 80),
-          cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0), 2);
-      cv::putText(gray_img, std::to_string(T_tag0_cam[6]), cv::Point2i(20, 110),
-          cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0), 2);
+      if (debug_plot) {
+        cv::putText(gray_img, "Farme position (xyz):", cv::Point2i(20, 20),
+            cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0), 2);
+        cv::putText(gray_img, std::to_string(T_tag0_cam[4]), cv::Point2i(20, 50),
+            cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0), 2);
+        cv::putText(gray_img, std::to_string(T_tag0_cam[5]), cv::Point2i(20, 80),
+            cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0), 2);
+        cv::putText(gray_img, std::to_string(T_tag0_cam[6]), cv::Point2i(20, 110),
+            cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0), 2);
+      }
     }
 
-
-    // blur(edge, edge,cv::Size(7,7));
-    // Canny(edge,edge,0,30,3);
-    cv::imshow("test", gray_img);
-    cv::waitKey(1);
+    if (debug_plot) {
+      cv::imshow("test", gray_img);
+      cv::waitKey(1);
+    }
   }
   return 0;
 }
