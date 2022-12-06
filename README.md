@@ -48,7 +48,7 @@ or manually set config path by `./localization ${path_to_yaml_file}`
 
 ## Sample
 
-![sample.gif](/Users/yuxuan/git/apriltaglocal_deploy/sample.gif)
+![sample.gif](sample.gif)
 
 ## Trouble shooting
 
