@@ -49,7 +49,7 @@ make
 
 ## Sample
 
-![sample.gif](/Users/yuxuan/git/apriltaglocal_deploy/sample.gif)
+![sample.gif](sample.gif)
 
 
 
